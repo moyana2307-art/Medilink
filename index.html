@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLink Zimbabwe - Unified Portal</title>
+    <!-- Link to external stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sandbox-container">
+    
+    <!-- LEFT PANEL: PHONE CALL EMULATOR INTERFACE -->
+    <div class="phone-wrapper">
+        <button class="btn btn-primary" onclick="initiateUSSD()" style="width: 100%; margin-bottom: 15px; padding: 12px;">
+            Handling Code (*141#)
+        </button>
+
+        <div class="phone-frame">
+            <div class="phone-screen">
+                <div class="network-bar">
+                    <span>Econet ZW</span>
+                    <span>15:22</span>
+                </div>
+                
+                <div id="idleScreen" class="idle-screen">
+                    <div class="icon-hero">🏥</div>
+                    <div class="brand-title">MediLink Gateway</div>
+                    <div class="helper-text">Initiate the wireless session wrapper using the button above.</div>
+                </div>
+
+                <div id="ussdBox" class="ussd-modal" style="display: none;">
+                    <div class="ussd-text" id="ussdPrompt">Loading Application Channels...</div>
+                    <input type="text" id="ussdField" class="ussd-input" autofocus>
+                    <div class="ussd-actions">
+                        <button class="btn btn-secondary" onclick="abortSession()">Cancel</button>
+                        <button class="btn btn-primary" onclick="handleUSSDStep()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: UNIFIED HOSPITAL ADMIN DASHBOARD -->
+    <div class="dashboard-panel">
+        <div class="admin-header">
+            <div>
+                <h2 class="main-title">MediLink Central Administration</h2>
+                <div class="subtitle">Integrated Emergency Tracking & Outpatient Management</div>
+            </div>
+            <div class="node-badge">📍 Node: Harare Base</div>
+        </div>
+
+        <div class="admin-tabs">
+            <button id="tabEmergencies" class="tab-btn active" onclick="switchView('emergencies')">🚨 Emergency Board</button>
+            <button id="tabAppointments" class="tab-btn" onclick="switchView('appointments')">📅 Outpatient Calendar</button>
+        </div>
+
+        <!-- VIEW 1: EMERGENCY GRID MANAGEMENT -->
+        <div id="viewEmergencies">
+            <div class="map-canvas">
+                <div class="map-overlay-text">CELL-GRID TRACKING INFRASTRUCTURE</div>
+                <div id="ambMarker" class="map-marker asset-marker" style="display:none;">🚑 Fleet 01</div>
+                <div id="incMarker" class="map-marker incident-marker" style="display:none;">🔴 Incident Zone</div>
+            </div>
+
+            <div class="metrics-row">
+                <div class="metric-card"><label>CRITICAL INCIDENTS</label><span id="countEmerg" class="text-rose">0</span></div>
+                <div class="metric-card"><label>ACTIVE ROUTED FLEETS</label><span id="countFleets">0</span></div>
+                <div class="metric-card"><label>DISPATCH EFFICIENCY</label><span class="text-emerald">99.4%</span></div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Case Identifier</th>
+                        <th>Condition / Category</th>
+                        <th>Triangulated Sector</th>
+                        <th>Assigned Vehicle</th>
+                    </tr>
+                </thead>
+                <tbody id="emergencyTableBody">
+                    <tr><td colspan="4" class="empty-row-msg">No operational active crisis signals tracked.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- VIEW 2: APPOINTMENT SCHEDULER BOARD -->
+        <div id="viewAppointments" style="display: none;">
+            <div class="metrics-row">
+                <div class="metric-card"><label>TOTAL REGISTERED APPOINTMENTS</label><span id="countAppts" class="text-brand">0</span></div>
+                <div class="metric-card"><label>NEXT AVAILABLE ENTRY</label><span class="next-avail-text">Tomorrow, 09:00</span></div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Patient ID Key</th>
+                        <th>Medical Specialty Clinic</th>
+                        <th>Preferred Day Range</th>
+                    </tr>
+                </thead>
+                <tbody id="appointmentTableBody">
+                    <tr><td colspan="3" class="empty-row-msg">No upcoming outpatient scheduled bookings found.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Link to external JavaScript logical execution engines -->
+<script src="app.js"></script>
+</body>
+</html>
