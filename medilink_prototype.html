@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLink Zimbabwe - Unified Portal</title>
+    <style>
+        :root {
+            --bg: #f1f5f9;
+            --surface: #ffffff;
+            --brand: #0284c7;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --phone-bg: #0f172a;
+            --emerald: #10b981;
+            --rose: #ef4444;
+            --amber: #f59e0b;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .sandbox-container {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 30px;
+            max-width: 1400px;
+            width: 100%;
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        }
+
+        @media (max-width: 900px) {
+            .sandbox-container { grid-template-columns: 1fr; }
+        }
+
+        /* Phone Simulator Layout */
+        .phone-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .phone-frame {
+            width: 330px;
+            height: 600px;
+            background: var(--phone-bg);
+            border-radius: 40px;
+            padding: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            border: 4px solid #334155;
+            box-sizing: border-box;
+        }
+
+        .phone-screen {
+            flex: 1;
+            background-color: #000;
+            border-radius: 28px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+            font-family: monospace;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .network-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 6px;
+        }
+
+        .ussd-modal {
+            background: #fff;
+            color: #000;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: auto;
+            margin-bottom: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .ussd-text {
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .ussd-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 1rem;
+        }
+
+        .ussd-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Buttons & Interface UI */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .btn-primary { background: var(--brand); color: white; }
+        .btn-primary:hover { background: #0369a1; }
+        .btn-danger { background: var(--rose); color: white; }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+
+        /* Admin Panels */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: #f1f5f9;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: var(--brand);
+            color: white;
+            border-color: var(--brand);
+        }
+
+        .map-canvas {
+            height: 150px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .map-marker {
+            position: absolute;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .metric-card {
+            background: #f8fafc;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .metric-card label { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; display: block; }
+        .metric-card span { font-size: 1.4rem; font-weight: 700; color: var(--text); display: block; margin-top: 4px; }
+
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .data-table th, .data-table td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; }
+        .data-table th { background: #f8fafc; color: var(--text-muted); }
+        
+        .pill { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; display: inline-block; }
+        .pill-emergency { background: #fee2e2; color: #991b1b; }
+        .pill-appointment { background: #e0f2fe; color: #0369a1; }
+        .pill-success { background: #dcfce7; color: #166534; }
+    </style>
+</head>
+<body>
+
+<div class="sandbox-container">
+    
+    <!-- LEFT PANEL: PHONE CALL EMULATOR INTERFACE -->
+    <div class="phone-wrapper">
+        <button class="btn btn-primary" onclick="initiateUSSD()" style="width: 100%; margin-bottom: 15px; padding: 12px;">📞 Dial System Code (*141#)</button>
+
+        <div class="phone-frame">
+            <div class="phone-screen">
+                <div class="network-bar">
+                    <span>Econet ZW</span>
+                    <span>14:48</span>
+                </div>
+                
+                <div id="idleScreen" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; gap: 10px;">
+                    <div style="font-size: 2.5rem;">🏥</div>
+                    <div style="font-size: 0.9rem; font-weight:bold;">MediLink Gateway</div>
+                    <div style="font-size: 0.75rem; color: #94a3b8;">Initiate the wireless session wrapper using the button above.</div>
+                </div>
+
+                <div id="ussdBox" class="ussd-modal" style="display: none;">
+                    <div class="ussd-text" id="ussdPrompt">Loading Application Channels...</div>
+                    <input type="text" id="ussdField" class="ussd-input" autofocus>
+                    <div class="ussd-actions">
+                        <button class="btn btn-secondary" onclick="abortSession()">Cancel</button>
+                        <button class="btn btn-primary" onclick="handleUSSDStep()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: UNIFIED HOSPITAL ADMIN DASHBOARD -->
+    <div class="dashboard-panel">
+        <div class="admin-header">
+            <div>
+                <h2 style="margin:0; font-size:1.5rem;">MediLink Central Administration</h2>
+                <div style="color: var(--text-muted); font-size:0.85rem; margin-top:2px;">Integrated Emergency Tracking & Outpatient Management</div>
+            </div>
+            <div style="font-size:0.8rem; background:#e2e8f0; padding:6px 12px; border-radius:20px; font-weight:bold;">📍 Node: Victoria Falls Base</div>
+        </div>
+
+        <div class="admin-tabs">
+            <button id="tabEmergencies" class="tab-btn active" onclick="switchView('emergencies')">🚨 Emergency Board</button>
+            <button id="tabAppointments" class="tab-btn" onclick="switchView('appointments')">📅 Outpatient Calendar</button>
+        </div>
+
+        <!-- VIEW 1: EMERGENCY GRID MANAGEMENT -->
+        <div id="viewEmergencies">
+            <div class="map-canvas">
+                <div style="position:absolute; color:var(--text-muted); font-size:0.7rem; padding:10px; font-weight:bold; letter-spacing:1px;">CELL-GRID TRACKING INFRASTRUCTURE</div>
+                <div id="ambMarker" class="map-marker" style="top:50px; left:40px; display:none; color:var(--emerald);">🚑 Fleet 01</div>
+                <div id="incMarker" class="map-marker" style="top:50px; left:200px; display:none; color:var(--rose);">🔴 Incident Zone</div>
+            </div>
+
+            <div class="metrics-row">
+                <div class="metric-card"><label>CRITICAL INCIDENTS</label><span id="countEmerg" style="color:var(--rose);">0</span></div>
+                <div class="metric-card"><label>ACTIVE ROUTED FLEETS</label><span id="countFleets">0</span></div>
+                <div class="metric-card"><label>DISPATCH EFFICIENCY</label><span style="color:var(--emerald);">99.4%</span></div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Case Identifier</th>
+                        <th>Condition / Category</th>
+                        <th>Triangulated Sector</th>
+                        <th>Assigned Vehicle</th>
+                    </tr>
+                </thead>
+                <tbody id="emergencyTableBody">
+                    <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">No operational active crisis signals tracked.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- VIEW 2: APPOINTMENT SCHEDULER BOARD -->
+        <div id="viewAppointments" style="display: none;">
+            <div class="metrics-row">
+                <div class="metric-card"><label>TOTAL REGISTERED APPOINTMENTS</label><span id="countAppts" style="color:var(--brand);">0</span></div>
+                <div class="metric-card"><label>NEXT AVAILABLE ENTRY</label><span style="font-size:1.1rem; margin-top:8px; color:var(--emerald);">Tomorrow, 09:00</span></div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Patient ID Key</th>
+                        <th>Medical Specialty Clinic</th>
+                        <th>Preferred Day Range</th>
+                    </tr>
+                </thead>
+                <tbody id="appointmentTableBody">
+                    <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px;">No upcoming outpatient scheduled bookings found.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // State Machine Properties
+    let currentFlow = ""; 
+    let currentStep = 0;
+    
+    // Captured Data Models
+    let tempType = "";
+    let tempDetail = "";
+
+    // Global Collections
+    let emergencyRegistry = [];
+    let appointmentRegistry = [];
+
+    function initiateUSSD() {
+        currentFlow = "root";
+        currentStep = 1;
+        document.getElementById('idleScreen').style.display = 'none';
+        document.getElementById('ussdBox').style.display = 'block';
+        document.getElementById('ussdField').style.display = 'block';
+        
+        document.getElementById('ussdPrompt').innerText = `CON MEDILINK CENTRAL PORTAL\nSelect Intended Channel:\n1. 🚨 REPORT CRITICAL EMERGENCY\n2. 📅 BOOK OUTPATIENT APPOINTMENT`;
+        document.getElementById('ussdField').value = "";
+        document.getElementById('ussdField').focus();
+    }
+
+    function handleUSSDStep() {
+        const input = document.getElementById('ussdField').value.trim();
+        if(!input) return;
+
+        // --- ROOT CHANNEL ROUTING ---
+        if (currentFlow === "root" && currentStep === 1) {
+            if (input === "1") {
+                currentFlow = "emergency";
+                currentStep = 1;
+                document.getElementById('ussdPrompt').innerText = `CON EMERGENCY HANDSHAKE\nSelect Crisis Classification:\n1. Maternal / Delivery\n2. Severe Trauma / Road Crash\n3. Cardiac / Breathing Distress`;
+            } else if (input === "2") {
+                currentFlow = "appointment";
+                currentStep = 1;
+                document.getElementById('ussdPrompt').innerText = `CON OUTPATIENT SCHEDULER\nSelect Clinic Specialty:\n1. General Medical Care\n2. Pediatrics & Immunization\n3. Chronic Care / Diabetes Management`;
+            } else {
+                initiateUSSD();
+            }
+            document.getElementById('ussdField').value = "";
+            return;
+        }
+
+        // --- EMERGENCY BRANCH STATE ENGINE ---
+        if (currentFlow === "emergency") {
+            if (currentStep === 1) {
+                if(input === "1") tempType = "Maternal / Delivery";
+                else if(input === "2") tempType = "Severe Trauma / Road Crash";
+                else tempType = "Cardiac / Breathing Distress";
+                
+                currentStep = 2;
+                document.getElementById('ussdPrompt').innerText = `CON LAC TRIANGULATION\nVerify Incident Sector Node:\n1. Victoria Falls Core\n2. Chinotimba Sub-Grid\n3. Mkhosana Sub-Sector`;
+            } 
+            else if (currentStep === 2) {
+                let sector = "Victoria Falls Core";
+                if(input === "2") sector = "Chinotimba Sub-Grid";
+                if(input === "3") sector = "Mkhosana Sub-Sector";
+
+                const caseId = "EM-" + Math.floor(100 + Math.random() * 900);
+                const fleet = "Ambulance Asset " + Math.floor(1 + Math.random() * 5);
+
+                emergencyRegistry.unshift({ id: caseId, type: tempType, location: sector, asset: fleet });
+                
+                // Show tracking marks on administrative canvas maps
+                document.getElementById('ambMarker').style.display = 'block';
+                document.getElementById('incMarker').style.display = 'block';
+
+                document.getElementById('ussdPrompt').innerText = `END CRISIS CAPTURED.\nCase: ${caseId}.\n${fleet} dispatched to cell tower perimeter near ${sector}. Keep line open.`;
+                document.getElementById('ussdField').style.display = 'none';
+                
+                syncUIRegistries();
+                switchView('emergencies');
+            }
+            document.getElementById('ussdField').value = "";
+        }
+
+        // --- APPOINTMENT BRANCH STATE ENGINE ---
+        if (currentFlow === "appointment") {
+            if (currentStep === 1) {
+                if(input === "1") tempType = "General Medical Care";
+                else if(input === "2") tempType = "Pediatrics & Immunization";
+                else tempType = "Chronic Care / Diabetes";
+
+                currentStep = 2;
+                document.getElementById('ussdPrompt').innerText = `CON CALENDAR CONFIGURATION\nSelect Day Window Range:\n1. Earliest Available (Within 48h)\n2. Coming Weekend Window\n3. Mid-Next Week Allocation`;
+            }
+            else if (currentStep === 2) {
+                let windowStr = "Within 48 Hours";
+                if(input === "2") windowStr = "Coming Weekend Window";
+                if(input === "3") windowStr = "Mid-Next Week Allocation";
+
+                const patientId = "PT-" + Math.floor(1000 + Math.random() * 9000);
+                appointmentRegistry.unshift({ id: patientId, clinic: tempType, slot: windowStr });
+
+                document.getElementById('ussdPrompt').innerText = `END BOOKING CONFIRMED\nID: ${patientId}\nYour appointment voucher at ${tempType} is logged for [${windowStr}]. A confirmation SMS text will follow.`;
+                document.getElementById('ussdField').style.display = 'none';
+
+                syncUIRegistries();
+                switchView('appointments');
+            }
+            document.getElementById('ussdField').value = "";
+        }
+    }
+
+    function abortSession() {
+        document.getElementById('idleScreen').style.display = 'flex';
+        document.getElementById('ussdBox').style.display = 'none';
+    }
+
+    function switchView(target) {
+        if(target === 'emergencies') {
+            document.getElementById('viewEmergencies').style.display = 'block';
+            document.getElementById('viewAppointments').style.display = 'none';
+            document.getElementById('tabEmergencies').classList.add('active');
+            document.getElementById('tabAppointments').classList.remove('active');
+        } else {
+            document.getElementById('viewEmergencies').style.display = 'none';
+            document.getElementById('viewAppointments').style.display = 'block';
+            document.getElementById('tabEmergencies').classList.remove('active');
+            document.getElementById('tabAppointments').classList.add('active');
+        }
+    }
+
+    function syncUIRegistries() {
+        // Sync Emergency Readouts
+        document.getElementById('countEmerg').innerText = emergencyRegistry.length;
+        document.getElementById('countFleets').innerText = emergencyRegistry.length;
+        const eBody = document.getElementById('emergencyTableBody');
+        if(emergencyRegistry.length === 0) {
+            eBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">No operational active crisis signals tracked.</td></tr>`;
+        } else {
+            eBody.innerHTML = emergencyRegistry.map(item => `
+                <tr>
+                    <td><span class="pill pill-emergency">${item.id}</span></td>
+                    <td><strong>${item.type}</strong></td>
+                    <td><code>${item.location}</code></td>
+                    <td><span class="pill pill-success">${item.asset}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Sync Appointment Readouts
+        document.getElementById('countAppts').innerText = appointmentRegistry.length;
+        const aBody = document.getElementById('appointmentTableBody');
+        if(appointmentRegistry.length === 0) {
+            aBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px;">No upcoming outpatient scheduled bookings found.</td></tr>`;
+        } else {
+            aBody.innerHTML = appointmentRegistry.map(item => `
+                <tr>
+                    <td><span class="pill pill-appointment">${item.id}</span></td>
+                    <td><strong>${item.clinic}</strong></td>
+                    <td><code>${item.slot}</code></td>
+                </tr>
+            `).join('');
+        }
+    }
+</script>
+</body>
+</html>
